@@ -1133,6 +1133,20 @@ Editor::canvas_playhead_cursor_event (GdkEvent *event, ArdourCanvas::Item* item)
 }
 
 bool
+Editor::canvas_section_box_event (GdkEvent *event)
+{
+	if (event->type == GDK_BUTTON_RELEASE) {
+		GdkEventButton* b = reinterpret_cast<GdkEventButton*> (event);
+
+		if (b && Keyboard::is_context_menu_event (b)) {
+			popup_section_box_menu(b->button, b->time);
+			return true;
+		}
+	}
+	return false;
+}
+
+bool
 Editor::canvas_note_event (GdkEvent *event, ArdourCanvas::Item* item)
 {
 	if (!internal_editing()) {
