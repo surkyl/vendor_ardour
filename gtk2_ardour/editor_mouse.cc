@@ -850,11 +850,23 @@ Editor::button_press_handler_1 (ArdourCanvas::Item* item, GdkEvent* event, ItemT
 		}
 		return true;
 
+	case SectionMarkerBarItem: {
+		timepos_t start (canvas_event_sample (event));
+		timepos_t end;
+		Location *l = _session->locations()->section_at(start, end);
+		if ( l ) {
+			//set selection range
+			selection->clear();
+			selection->set(start, end);
+			_session->request_locate(start.samples());
+			return true;
+		}
+		//else FALLTHROUGH:
+	}
 	case TimecodeRulerItem:
 	case SamplesRulerItem:
 	case MinsecRulerItem:
 	case MarkerBarItem:
-	case SectionMarkerBarItem:
 		if (!Keyboard::modifier_state_equals (event->button.state, Keyboard::PrimaryModifier)
 		    && !ArdourKeyboard::indicates_constraint (event->button.state)) {
 			_drags->set (new CursorDrag (this, *_playhead_cursor, false), event);

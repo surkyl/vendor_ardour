@@ -1113,6 +1113,7 @@ Editor::control_scroll (float fraction)
 	/* move visuals, we'll catch up with it later */
 
 	_playhead_cursor->set_position (*_control_scroll_target);
+	update_section_box();
 	UpdateAllTransportClocks (*_control_scroll_target);
 
 	if (*_control_scroll_target > (current_page_samples() / 2)) {
@@ -1268,6 +1269,8 @@ Editor::map_position_change (samplepos_t sample)
 	if (!_session->locate_initiated()) {
 		_playhead_cursor->set_position (sample);
 	}
+
+	update_section_box();
 }
 
 void
@@ -1585,6 +1588,25 @@ Editor::popup_xfade_out_context_menu (int button, int32_t time, ArdourCanvas::It
 	fill_xfade_menu (items, false);
 
 	xfade_out_context_menu.popup (button, time);
+}
+
+void
+Editor::popup_section_box_menu (int button, int32_t time)
+{
+	using namespace Menu_Helpers;
+
+	MenuList& items (section_box_menu.items());
+	items.clear ();
+
+	items.push_back (MenuElem (_("Copy/Paste Range Section to Edit Point"), sigc::bind (sigc::mem_fun (*this, &Editor::cut_copy_section), CopyPasteSection)));
+	items.push_back (MenuElem (_("Cut/Paste Range Section to Edit Point"), sigc::bind (sigc::mem_fun (*this, &Editor::cut_copy_section), CutPasteSection)));
+	items.push_back (MenuElem (_("Delete Range Section"), sigc::bind (sigc::mem_fun (*this, &Editor::cut_copy_section), DeleteSection)));
+#if 0
+	items.push_back (SeparatorElem());
+	items.push_back (MenuElem (_("Delete all markers in Section"), sigc::bind (sigc::mem_fun (*this, &Editor::cut_copy_section), DeleteSection)));
+#endif
+
+	section_box_menu.popup (button, time);
 }
 
 void
@@ -2466,6 +2488,9 @@ Editor::set_state (const XMLNode& node, int version)
 	} else {
 		_playhead_cursor->set_position (0);
 	}
+
+	update_selection_markers ();
+	update_section_box();
 
 	node.get_property ("mixer-width", editor_mixer_strip_width);
 
@@ -5001,6 +5026,7 @@ Editor::on_samples_per_pixel_changed ()
 	refresh_location_display();
 	_summary->set_overlays_dirty ();
 
+	update_section_box();
 	update_marker_labels ();
 
 	instant_save ();
@@ -5685,6 +5711,7 @@ Editor::located ()
 		if (_follow_playhead && !_pending_initial_locate) {
 			reset_x_origin_to_follow_playhead ();
 		}
+		update_section_box();
 	}
 
 	_pending_locate_request = false;
@@ -6453,6 +6480,8 @@ Editor::super_rapid_screen_update ()
 	if (!_pending_locate_request && !_session->locate_initiated()) {
 		_playhead_cursor->set_position (sample);
 	}
+
+	update_section_box();
 
 	if (_session->requested_return_sample() >= 0) {
 		_last_update_time = 0;
