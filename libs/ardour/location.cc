@@ -1620,6 +1620,44 @@ Locations::next_section (Location* l, timepos_t& start, timepos_t& end) const
 }
 
 Location*
+Locations::section_at (timepos_t& start, timepos_t& end) const
+{
+	vector<LocationPair> locs;
+	{
+		Glib::Threads::RWLock::ReaderLock lm (_lock);
+
+		for (auto const& i: locations) {
+			if (i->is_session_range ()) {
+				continue;
+			} else if (i->is_section ()) {
+				locs.push_back (make_pair (i->start(), i));
+			}
+		}
+	}
+
+	LocationStartEarlierComparison cmp;
+	sort (locs.begin(), locs.end(), cmp);
+
+	if (locs.size () < 2) {
+		return NULL;
+	}
+
+	Location* rv = NULL;
+	timepos_t test = start;
+	for (auto const& i: locs) {
+		if (test >= i.first) {
+			start = i.first;
+			rv    = i.second;
+		} else {
+			end = i.first;
+			return rv;
+		}
+	}
+
+	return NULL;
+}
+
+Location*
 Locations::session_range_location () const
 {
 	Glib::Threads::RWLock::ReaderLock lm (_lock);

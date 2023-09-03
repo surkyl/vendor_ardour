@@ -299,6 +299,7 @@ public:
 	timepos_t first_mark_after (timepos_t const &, bool include_special_ranges = false);
 
 	Location* next_section (Location*, timepos_t&, timepos_t&) const;
+	Location* section_at (timepos_t&, timepos_t&) const;
 
 	void marks_either_side (timepos_t const &, timepos_t &, timepos_t &) const;
 
