@@ -411,6 +411,7 @@ Editor::Editor ()
 	, _track_selection_change_without_scroll (false)
 	, _editor_track_selection_change_without_scroll (false)
 	, _playhead_cursor (0)
+	, _section_box (0)
 	, _snapped_cursor (0)
 	, cd_marker_bar_drag_rect (0)
 	, cue_marker_bar_drag_rect (0)
@@ -927,6 +928,7 @@ Editor::~Editor()
 	delete selection;
 	delete cut_buffer;
 	delete _cursors;
+	delete _section_box;
 
 	LuaInstance::destroy_instance ();
 
