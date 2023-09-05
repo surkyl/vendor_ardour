@@ -1006,6 +1006,52 @@ icon_strip_width (cairo_t* cr, const int width, const int height, const uint32_t
 	cairo_stroke (cr);
 }
 
+/** grid (tempo) tool */
+static void
+icon_tool_grid (cairo_t* cr, const int width, const int height, const uint32_t fg_color)
+{
+	const double lw = DEFAULT_LINE_WIDTH;
+	const double xm = rint (width * .5) - lw * .5;
+	const double ym = rint (height * .5) - lw * .5;
+
+	const double dx = ceil (width * .3);
+	const double dy = ceil (height * .25);
+
+	const double x0 = xm - dx;
+	const double x1 = xm + dx;
+	const double y0 = ym - dy;
+	const double y1 = ym + dy;
+
+	const double arx = width * .15;
+	const double ary = height * .15;
+
+	Gtkmm2ext::set_source_rgba (cr, fg_color);
+	cairo_set_line_width (cr, lw);
+
+	// left + right
+	cairo_move_to (cr, x0, y0);
+	cairo_line_to (cr, x0, y1);
+	cairo_move_to (cr, x1, y0);
+	cairo_line_to (cr, x1, y1);
+
+	// horiz center line
+	cairo_move_to (cr, x0, ym);
+	cairo_line_to (cr, x1, ym);
+
+	// arrow left
+	cairo_move_to (cr, x0, ym);
+	cairo_rel_line_to (cr, arx, -ary);
+	cairo_move_to (cr, x0, ym);
+	cairo_rel_line_to (cr, arx, ary);
+
+	// arrow right
+	cairo_move_to (cr, x1, ym);
+	cairo_rel_line_to (cr, -arx, -ary);
+	cairo_move_to (cr, x1, ym);
+	cairo_rel_line_to (cr, -arx, ary);
+	cairo_stroke (cr);
+}
+
 /** 5-pin DIN MIDI socket */
 static void
 icon_din_midi (cairo_t* cr, const int width, const int height, const uint32_t fg_color)
@@ -1438,6 +1484,9 @@ ArdourWidgets::ArdourIcon::render (cairo_t*                                   cr
 			break;
 		case ToolGrab:
 			icon_tool_grab (cr, width, height);
+			break;
+		case ToolGrid:
+			icon_tool_grid (cr, width, height, fg_color);
 			break;
 		case ToolCut:
 			icon_tool_cut (cr, width, height);
