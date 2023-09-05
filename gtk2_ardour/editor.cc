@@ -924,6 +924,7 @@ Editor::~Editor()
 	delete _snapshots;
 	delete _sections;
 	delete _locations;
+	delete _canvas_grid_zone;
 	delete _properties_box;
 	delete selection;
 	delete cut_buffer;
@@ -3257,6 +3258,7 @@ Editor::setup_toolbar ()
 	mouse_mode_size_group->add_widget (mouse_cut_button);
 	mouse_mode_size_group->add_widget (mouse_select_button);
 	mouse_mode_size_group->add_widget (mouse_timefx_button);
+	mouse_mode_size_group->add_widget (mouse_grid_button);
 	if (!Profile->get_mixbus()) {
 		mouse_mode_size_group->add_widget (mouse_audition_button);
 	}
@@ -3274,6 +3276,8 @@ Editor::setup_toolbar ()
 		mouse_mode_size_group->add_widget (zoom_preset_selector);
 		mouse_mode_size_group->add_widget (visible_tracks_selector);
 	}
+
+	mouse_mode_size_group->add_widget (stretch_midi_cb);
 
 	mouse_mode_size_group->add_widget (grid_type_selector);
 	mouse_mode_size_group->add_widget (draw_length_selector);
@@ -3302,6 +3306,7 @@ Editor::setup_toolbar ()
 	}
 
 	mouse_mode_hbox->pack_start (mouse_timefx_button, false, false);
+	mouse_mode_hbox->pack_start (mouse_grid_button, false, false);
 	mouse_mode_hbox->pack_start (mouse_draw_button, false, false);
 	mouse_mode_hbox->pack_start (mouse_content_button, false, false);
 
@@ -3391,6 +3396,8 @@ Editor::setup_toolbar ()
 	snap_box.set_spacing (2);
 	snap_box.set_border_width (2);
 
+	stretch_midi_cb.set_name ("mouse mode button");
+
 	grid_type_selector.set_name ("mouse mode button");
 	draw_length_selector.set_name ("mouse mode button");
 	draw_velocity_selector.set_name ("mouse mode button");
@@ -3421,6 +3428,13 @@ Editor::setup_toolbar ()
 	nudge_box->pack_start (nudge_backward_button, false, false);
 	nudge_box->pack_start (nudge_forward_button, false, false);
 	nudge_box->pack_start (*nudge_clock, false, false);
+
+	stretch_midi_cb.set_label(_("Stretch MIDI"));
+
+	/* Grid  - these tools are only visible when in Grid mode */
+	grid_box.set_spacing (2);
+	grid_box.set_border_width (2);
+	grid_box.pack_start (stretch_midi_cb, false, false, 4);
 
 	/* Draw  - these MIDI tools are only visible when in Draw mode */
 	draw_box.set_spacing (2);
@@ -3460,6 +3474,8 @@ Editor::setup_toolbar ()
 	toolbar_hbox.pack_start (snap_box, false, false);
 	toolbar_hbox.pack_start (*(manage (new ArdourVSpacer ())), false, false, 3);
 	toolbar_hbox.pack_start (*nudge_box, false, false);
+	toolbar_hbox.pack_start (_grid_box_spacer, false, false, 3);
+	toolbar_hbox.pack_start (grid_box, false, false);
 	toolbar_hbox.pack_start (_draw_box_spacer, false, false, 3);
 	toolbar_hbox.pack_start (draw_box, false, false);
 	toolbar_hbox.pack_end (_zoom_box, false, false, 2);
@@ -3634,6 +3650,7 @@ Editor::setup_tooltips ()
 	set_tooltip (tav_expand_button, _("Expand Tracks"));
 	set_tooltip (tav_shrink_button, _("Shrink Tracks"));
 	set_tooltip (visible_tracks_selector, _("Number of visible tracks"));
+	set_tooltip (stretch_midi_cb, _("Enable to move MIDI events when stretching the Grid"));
 	set_tooltip (draw_length_selector, _("Note Length to Draw (AUTO uses the current Grid setting)"));
 	set_tooltip (draw_velocity_selector, _("Note Velocity to Draw (AUTO uses the nearest note's velocity)"));
 	set_tooltip (draw_channel_selector, _("Note Channel to Draw (AUTO uses the nearest note's channel)"));
