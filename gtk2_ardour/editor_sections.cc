@@ -463,8 +463,22 @@ EditorSections::button_press (GdkEventButton* ev)
 
 	if (ev->type == GDK_2BUTTON_PRESS || ev->type == GDK_3BUTTON_PRESS) {
 		TreeView::Selection::ListHandle_Path rows = _view.get_selection ()->get_selected_rows ();
+		assert (!rows.empty ());
+		Gtk::TreeModel::Row row = *_model->get_iter (*rows.begin ());
+
+		if (column == _view.get_column (1)) {
+			timepos_t start = row[_columns.start];
+			_session->request_locate (start.samples());
+			return false;
+		} else if (column == _view.get_column (2)) {
+			timepos_t end   = row[_columns.end];
+			_session->request_locate (end.samples());
+			return false;
+		}
+#if 0
 		_view.set_cursor( *rows.begin (), *_view.get_column(0), true);
 		return true;
+#endif
 	}
 
 	if (Gtkmm2ext::Keyboard::is_context_menu_event (ev)) {
