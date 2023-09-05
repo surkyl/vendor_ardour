@@ -49,6 +49,7 @@ SectionBox::SectionBox (Editor& ed, ArdourCanvas::Item *parent)
 
 	set_ignore_events(false);
 	hide();
+	set_outline_what (ArdourCanvas::Rectangle::What (Rectangle::LEFT | Rectangle::RIGHT));
 
 	set_outline(true);
 	set_outline_color(0xFF0000FF);
