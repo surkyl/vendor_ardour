@@ -1027,7 +1027,7 @@ icon_tool_grid (cairo_t* cr, const int width, const int height, const uint32_t f
 
 	cairo_rectangle (cr, xc - lw * .5, yc - ln, lw, ln * 2);
 	cairo_rectangle (cr, xc - ln, yc - lw * .5, ln * 2, lw);
-	VECTORICONOUTLINEFILL (fg_color)
+	VECTORICONOUTLINEFILL (0xffffffff)
 
 	/* arrows */
 	const double x0 = xc - ln;
@@ -1048,7 +1048,7 @@ icon_tool_grid (cairo_t* cr, const int width, const int height, const uint32_t f
 	cairo_move_to (cr, x1, yc);
 	cairo_rel_line_to (cr, -arx, ary);
 
-	VECTORICONSTROKEOUTLINE (DEFAULT_LINE_WIDTH, fg_color);
+	VECTORICONSTROKEOUTLINE (DEFAULT_LINE_WIDTH, 0xffffffff);
 }
 
 /** 5-pin DIN MIDI socket */
