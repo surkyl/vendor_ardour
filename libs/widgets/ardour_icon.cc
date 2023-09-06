@@ -46,6 +46,14 @@ using namespace ArdourWidgets::ArdourIcon;
   cairo_set_source_rgba (cr, 1, 1, 1, (fillalpha)); \
   cairo_fill (cr);
 
+#define VECTORICONOUTLINEFILL(color)             \
+  cairo_set_line_cap (cr, CAIRO_LINE_CAP_ROUND); \
+  cairo_set_line_width (cr, OUTLINEWIDTH);       \
+  ardour_icon_set_source_inv_rgba (cr, color);   \
+  cairo_stroke_preserve (cr);                    \
+  Gtkmm2ext::set_source_rgba (cr, color);        \
+  cairo_fill (cr);
+
 #define VECTORICONSTROKEOUTLINE(LW, color)        \
   cairo_set_line_cap (cr, CAIRO_LINE_CAP_ROUND);  \
   cairo_set_line_width (cr, (LW) + OUTLINEWIDTH); \
@@ -1010,46 +1018,37 @@ icon_strip_width (cairo_t* cr, const int width, const int height, const uint32_t
 static void
 icon_tool_grid (cairo_t* cr, const int width, const int height, const uint32_t fg_color)
 {
+	/* cross (plus sign) */
 	const double lw = DEFAULT_LINE_WIDTH;
-	const double xm = rint (width * .5) - lw * .5;
-	const double ym = rint (height * .5) - lw * .5;
+	const double lc = fmod (lw * .5, 1.0);
+	const double xc = rint (width * .5) - lc;
+	const double yc = rint (height * .5) - lc;
+	const double ln = rint (std::min (width, height) * .3);
 
-	const double dx = ceil (width * .3);
-	const double dy = ceil (height * .25);
+	cairo_rectangle (cr, xc - lw * .5, yc - ln, lw, ln * 2);
+	cairo_rectangle (cr, xc - ln, yc - lw * .5, ln * 2, lw);
+	VECTORICONOUTLINEFILL (fg_color)
 
-	const double x0 = xm - dx;
-	const double x1 = xm + dx;
-	const double y0 = ym - dy;
-	const double y1 = ym + dy;
+	/* arrows */
+	const double x0 = xc - ln;
+	const double x1 = xc + ln;
 
-	const double arx = width * .15;
-	const double ary = height * .15;
+	const double arx = ln * .5;
+	const double ary = ln * .25;
 
-	Gtkmm2ext::set_source_rgba (cr, fg_color);
-	cairo_set_line_width (cr, lw);
-
-	// left + right
-	cairo_move_to (cr, x0, y0);
-	cairo_line_to (cr, x0, y1);
-	cairo_move_to (cr, x1, y0);
-	cairo_line_to (cr, x1, y1);
-
-	// horiz center line
-	cairo_move_to (cr, x0, ym);
-	cairo_line_to (cr, x1, ym);
-
-	// arrow left
-	cairo_move_to (cr, x0, ym);
+	/* arrow left */
+	cairo_move_to (cr, x0, yc);
 	cairo_rel_line_to (cr, arx, -ary);
-	cairo_move_to (cr, x0, ym);
+	cairo_move_to (cr, x0, yc);
 	cairo_rel_line_to (cr, arx, ary);
 
-	// arrow right
-	cairo_move_to (cr, x1, ym);
+	/* arrow right */
+	cairo_move_to (cr, x1, yc);
 	cairo_rel_line_to (cr, -arx, -ary);
-	cairo_move_to (cr, x1, ym);
+	cairo_move_to (cr, x1, yc);
 	cairo_rel_line_to (cr, -arx, ary);
-	cairo_stroke (cr);
+
+	VECTORICONSTROKEOUTLINE (DEFAULT_LINE_WIDTH, fg_color);
 }
 
 /** 5-pin DIN MIDI socket */
