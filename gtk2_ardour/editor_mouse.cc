@@ -1930,8 +1930,9 @@ Editor::button_release_handler (ArdourCanvas::Item* item, GdkEvent* event, ItemT
 			break;
 
 		case MouseGrid:
-			printf("NONTREACHED MMMM\n");
-			//what here?
+			/* MouseGrid clicks are handled by _canvas_grid_zone */
+			assert(0);   /*NOTREACHED*/
+			abort();
 			break;
 
 		case MouseAudition:
